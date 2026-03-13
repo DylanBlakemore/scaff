@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g., v1.0.0). Optional when running on tag push."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          v="${{ github.ref_name }}"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            v="${{ inputs.version }}"
+          fi
+          if [[ -z "${v}" ]]; then
+            echo "version is empty; provide workflow_dispatch input.version or run on a tag push" >&2
+            exit 1
+          fi
+          if [[ "${v}" != v* ]]; then
+            echo "version must start with 'v' (got: ${v})" >&2
+            exit 1
+          fi
+          echo "version=${v}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create and push tag (manual runs only)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.version != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          v="${{ steps.version.outputs.version }}"
+
+          # If tag already exists on origin, do nothing.
+          if git ls-remote --tags origin "refs/tags/${v}" | grep -q "${v}"; then
+            echo "Tag ${v} already exists on origin; continuing."
+            exit 0
+          fi
+
+          git tag "${v}"
+          git push origin "${v}"
+
+      - name: Run CI checks
+        run: make ci
+
+      - name: Build release artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          v="${{ steps.version.outputs.version }}"
+          mkdir -p dist
+
+          # Cross-platform, portable builds (no CGO)
+          CGO_ENABLED=0 GOOS=linux   GOARCH=amd64 go build -o "dist/scaff_${v}_linux_amd64" .
+          CGO_ENABLED=0 GOOS=darwin  GOARCH=arm64 go build -o "dist/scaff_${v}_darwin_arm64" .
+          CGO_ENABLED=0 GOOS=darwin  GOARCH=amd64 go build -o "dist/scaff_${v}_darwin_amd64" .
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o "dist/scaff_${v}_windows_amd64.exe" .
+
+          (cd dist && sha256sum * > "checksums_${v}_sha256.txt")
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          files: |
+            dist/*
+

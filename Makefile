@@ -1,0 +1,25 @@
+.PHONY: help format lint test security ci
+
+GO ?= go
+
+help: ## Show this help message
+	@echo 'Usage: make [target]'
+	@echo ''
+	@echo 'Targets:'
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-12s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+format: ## Format code
+	$(GO) fmt ./...
+
+lint: ## Lint (style/static analysis)
+	$(GO) run github.com/golangci/golangci-lint/cmd/golangci-lint@latest run
+
+test: ## Run tests
+	$(GO) test ./...
+
+security: ## Security + dependency checks
+	$(GO) vet ./...
+	$(GO) mod verify
+	$(GO) run golang.org/x/vuln/cmd/govulncheck@latest ./...
+
+ci: format lint test security ## Run everything (CI parity)
