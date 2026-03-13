@@ -1,0 +1,14 @@
+{{ template "agents-header" . }}
+
+### Project layout
+
+This is a Go package (library) project.
+
+- Exported package code lives at the project root.
+- Tests are colocated alongside the source files they test.
+- Keep exported identifiers minimal.
+- Write doc comments for exported types/functions where the intent is not obvious.
+- Prefer smaller packages with clear responsibilities; avoid cyclic dependencies.
+- Keep packages small and focused; split into subpackages when responsibilities diverge.
+
+{{ template "agents-footer" . }}

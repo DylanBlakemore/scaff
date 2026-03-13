@@ -1,13 +1,6 @@
-.PHONY: help format lint test security build ci
+.PHONY: help format lint test security ci
 
 GO ?= go
-BIN_DIR ?= bin
-BINARY ?= scaff
-GOOS := $(shell $(GO) env GOOS)
-EXE :=
-ifeq ($(GOOS),windows)
-EXE = .exe
-endif
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -28,9 +21,5 @@ security: ## Security + dependency checks
 	$(GO) vet ./...
 	$(GO) mod verify
 	$(GO) run golang.org/x/vuln/cmd/govulncheck@latest ./...
-
-build: ## Build local binary to ./bin/
-	@mkdir -p "$(BIN_DIR)"
-	CGO_ENABLED=0 $(GO) build -o "$(BIN_DIR)/$(BINARY)$(EXE)" .
 
 ci: format lint test security ## Run everything (CI parity)

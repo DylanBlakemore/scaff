@@ -17,6 +17,11 @@ If you cannot run commands (or they fail for infra reasons), explain what you wo
 ### Code style and ergonomics
 
 - **Keep it simple and idiomatic**: prefer the standard library; avoid clever abstractions.
+- **Minimize comments**: comment when necessary to explain WHY, not WHAT.
+- **Prefer early returns**: reduce indentation; use guard clauses to keep happy paths flat.
+- **Naming**: choose meaningful names that are as short as possible while still clear.
+- **Testability**: keep “edges” (filesystem/network/process/env) at the edges; make core logic stateless/pure where practical.
+- **Dependency injection (lightweight)**: inject dependencies when it improves testability; avoid over-engineering.
 - **Errors**:
   - Return errors, don’t panic, except for truly unrecoverable programmer errors.
   - Wrap errors with context using `fmt.Errorf("...: %w", err)` at boundaries.

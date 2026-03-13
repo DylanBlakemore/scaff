@@ -1,101 +1,100 @@
-Below is a **revised PRD** that is **less prescriptive** and **starts with package creation as the first capability**. It focuses on the **product vision, capabilities, and architecture**, rather than implementation details or specific folder layouts.
-
----
-
 # PRD: Scaff
 
 ## Overview
 
-**Scaff** is a Go-native scaffolding and code-generation tool designed to help developers create and evolve Go projects with consistent structure and conventions.
+**Scaff** is a Go-native scaffolding and code generation tool designed to simplify the creation and evolution of Go projects.
 
-The tool provides lightweight generators for bootstrapping projects and adding new components to them over time. It is intentionally minimal and Go-idiomatic, focusing on practical workflows rather than framework-style abstraction.
+The tool helps developers quickly bootstrap new modules and add structured components to them over time, using lightweight conventions and generators.
 
-Scaff’s initial capabilities focus on **creating Go packages and CLI tools**, with the architecture designed to support additional project types in the future such as web applications, background workers, and multi-component repositories.
+Scaff focuses on reducing repetitive setup work while keeping generated projects transparent, idiomatic, and easy to modify.
 
-Unlike many scaffolding tools that only run once at project creation, Scaff is intended to remain useful throughout a project’s lifecycle by supporting **generators that add new components inside existing projects**, similar to Phoenix generators.
+The initial capabilities focus on generating **Go packages** and **CLI applications**, while the underlying architecture is designed to support additional project types in the future such as:
 
-The goal is to reduce repetitive setup work while keeping projects simple, transparent, and easy to maintain.
+* web applications
+* background workers
+* multi-binary repositories
+* monorepos
+
+A key design principle is that Scaff should remain useful beyond the initial project creation. Inspired by Phoenix-style generators, Scaff should support adding new components within an existing project using structured generators.
 
 ---
 
 # Problem
 
-Starting a new Go project typically involves repeated manual steps:
+Creating new Go projects typically requires repeating many setup steps:
 
-* creating module structures
+* initializing modules
 * establishing directory conventions
+* creating test scaffolding
 * wiring entrypoints
-* creating test files
-* setting up linting and formatting
-* configuring CI and release pipelines
+* setting up formatting, linting, and testing workflows
+* configuring CI and release automation
 
-Teams often solve these problems informally through internal templates or documentation, which leads to inconsistent structures and duplicated effort.
+Teams often solve these problems through documentation or copy-paste templates, which leads to inconsistent structures and duplicated effort.
 
-Existing tooling partially addresses this problem but tends to fall into one of several categories:
+Existing tools only partially address this problem. Some are too generic and lack Go-specific conventions, while others assume specific frameworks or only generate projects once.
 
-* generic template engines that lack Go-specific conventions
-* framework-specific generators that assume a particular stack
-* simple project generators that do not support evolving the project afterward
-
-There is currently no widely adopted tool that provides **general-purpose scaffolding for Go projects while remaining lightweight and extensible**.
+There is currently no widely adopted tool that provides **lightweight, extensible scaffolding for general Go development workflows**.
 
 ---
 
 # Product Vision
 
-Scaff should become a small, reliable utility that developers can use whenever they start or expand a Go project.
+Scaff should become a small, reliable utility that Go developers use whenever they start or expand a project.
 
 The tool should:
 
-* provide **sensible starting structures**
-* support **optional project tooling integrations**
-* allow projects to **grow through structured generators**
-* remain **framework-neutral and minimally opinionated**
+* create consistent project structures
+* support optional development tooling integrations
+* allow projects to evolve through structured generators
+* remain minimally opinionated and framework-neutral
 
-Scaff should not attempt to impose architecture patterns or replace developer judgment. Instead, it should offer a set of conventions that make common workflows faster and more consistent.
+Scaff should prioritize **clarity and simplicity** over abstraction. Generated code should be easy for developers to understand and modify.
 
 ---
 
 # Goals
 
-### Initial Goals
+## Initial Goals
 
 The first version of Scaff should support:
 
 * generating Go packages
 * generating Go CLI applications
-* optional integration of common project tooling
-* the ability to add new components within supported project types
+* optional integration of development tooling such as Makefiles and CI
+* optional release automation for CLI tools
+* generators that add components inside supported projects
 
-These capabilities establish the core scaffolding engine and generator model that future project types will rely on.
+These capabilities establish the core generator engine and architectural model that future project types will rely on.
 
-### Long-Term Goals
+## Long-Term Goals
 
-Over time, Scaff should expand to support additional types of projects and generators, including:
+Future capabilities may include generators for:
 
 * HTTP applications
 * background workers
-* multi-component repositories
-* project-level tooling generators
+* service-oriented architectures
+* monorepos containing multiple binaries
+* project-level tooling integrations
 * reusable template packs
 
-The architecture should allow these capabilities to be added without significant redesign.
+The architecture should allow these capabilities to be introduced incrementally.
 
 ---
 
 # Non-Goals
 
-Scaff is not intended to become a full framework or project management platform.
+Scaff is not intended to become a framework or project management platform.
 
-Specifically, the tool will not initially:
+In particular, the tool will not initially:
 
 * enforce architectural patterns
 * manage dependency upgrades
-* automatically modify arbitrary projects
-* provide a plugin marketplace
-* integrate deeply with non-Go ecosystems
+* modify arbitrary non-Scaff projects
+* integrate deeply with frontend ecosystems
+* implement a plugin marketplace
 
-The emphasis should remain on **simplicity, clarity, and developer control**.
+The focus should remain on lightweight scaffolding and structured code generation.
 
 ---
 
@@ -110,118 +109,158 @@ In the first version of Scaff, two project types will be supported:
 * Go packages
 * CLI applications
 
-Each project generator defines a basic structure and any optional tooling integrations that may be enabled at creation time.
+Each project generator defines an initial project structure and may optionally include additional tooling integrations.
 
-Project generators establish the foundation of the project and record minimal metadata so Scaff can recognize the project type later.
+Generated projects include minimal metadata that allows Scaff to detect the project type later and enable appropriate generators.
 
 ---
 
 ## Component Generators
 
-Component generators add new functionality within an existing project created by Scaff.
+Component generators add new functionality inside an existing Scaff-generated project.
 
-These generators are scoped to a specific project type.
+These generators allow projects to evolve over time.
 
-For example, within a CLI project a component generator might add a new command. In future project types, generators could add routes, handlers, jobs, or other project-specific elements.
+Examples include:
 
-This capability allows Scaff to remain useful after the initial project creation, enabling incremental project growth through structured generators.
+* adding a CLI command to a CLI project
+* adding routes to a web application
+* adding jobs to a worker system
+
+Each project type defines the component generators that apply to it.
+
+This design allows Scaff to remain useful after project creation rather than acting as a one-time generator.
 
 ---
 
 ## Optional Project Features
 
-When creating a project, users may optionally enable integrations that support common development workflows.
+Scaff may optionally generate supporting tooling to simplify common development workflows.
 
-Examples include:
+These integrations may include:
 
-* a Makefile containing common development tasks
+* Makefiles for common development tasks
 * CI integration using GitHub Actions
 * automated release pipelines for CLI binaries
 
-These features are intended to reduce the overhead of setting up development workflows while remaining optional and easily understandable.
-
-The generated tooling should follow simple conventions that teams can adjust if needed.
+These features are optional and should remain easy to understand and modify.
 
 ---
 
-# User Experience
+# Architecture Styles
 
-Developers interact with Scaff through a command-line interface that exposes two primary categories of operations:
+Some project types may support **architecture style presets** that influence how generated code is organized within the project.
 
-1. **Creating new projects**
-2. **Adding new components within existing projects**
+Architecture styles determine directory layout and generator behavior but do not impose specific frameworks or implementation patterns.
 
-Project creation commands initialize a new module and generate the selected project type.
+These styles exist to provide sensible starting structures and reduce early project design friction.
 
-Component commands operate inside an existing project and generate new functionality consistent with the project’s structure.
+Initial architecture styles may include:
 
-The interface should remain simple and discoverable, with commands organized around the types of generators available.
+* **minimal**, representing simple and shallow structures suitable for small projects
+* **layered**, representing separation between transport, logic, and persistence layers
+* **domain**, representing organization by domain capability rather than technical layer
+
+Architecture styles influence where generated components are placed within a project but should not constrain how developers implement their code.
 
 ---
 
-# Optional Tooling Integrations
+# Generator Model
 
-Scaff may optionally generate additional development tooling to improve the developer experience.
+Scaff is built around a generator engine that separates three key concepts:
 
-These integrations should be treated as modular features that can be enabled during project creation.
+1. **Project types**, which define the overall project structure and supported generators
+2. **Generators**, which define actions that create or modify project components
+3. **Architecture styles**, which determine where generated code is placed
+
+This separation allows new project types, generators, and architecture styles to be introduced without significant changes to the core engine.
+
+---
+
+# Strategy and Data-Driven Design
+
+The internal architecture of Scaff should distinguish between **behavioral logic** and **structural configuration**.
+
+### Strategy-Based Behavior
+
+Some aspects of the system represent distinct behaviors and should be implemented using a strategy-style model.
+
+These include:
+
+* project types
+* generators
+* feature integrations
+
+Each of these represents an action or capability with specific logic.
+
+### Data-Driven Structure
+
+Other aspects represent structural configuration and should be modeled as data rather than code.
+
+In particular, architecture styles should be defined through configuration that maps logical components to project locations.
+
+Generators should describe **what they create**, while the project structure determines **where those components are placed**.
+
+This separation ensures that architecture styles can evolve independently from generators.
+
+---
+
+# Optional Development Tooling
+
+Scaff may optionally generate project tooling that supports common development workflows.
+
+These features should be modular and reusable across project types.
 
 ### Makefile
 
-A Makefile may be generated to provide a consistent interface for common development tasks such as formatting, testing, linting, and running CI checks locally.
+A Makefile may be generated to provide a consistent interface for development tasks such as formatting, testing, and linting.
 
-The Makefile should include a standard command that performs the same checks that the CI pipeline will run.
+The Makefile should expose a unified command used by CI pipelines.
 
 ### Continuous Integration
 
 CI integration may be generated using GitHub Actions.
 
-The workflow should run standard checks for formatting, tests, and linting, either directly or via the Makefile if one is present.
+The workflow should run formatting checks, tests, and linting, either directly or via the Makefile if present.
 
 ### Release Automation
 
-For CLI applications, an optional release pipeline may be generated to build and publish binaries when version tags are created.
+CLI projects may optionally include a release pipeline that builds and publishes binaries when version tags are created.
 
-This capability is primarily intended to simplify distribution of CLI tools.
-
----
-
-# Architecture Principles
-
-Scaff should be built around a **generator engine** that separates project types, component generators, and optional features.
-
-This separation allows the system to evolve gradually as new project types and generators are added.
-
-The architecture should support three primary concepts:
-
-1. **Project generators**, which create new projects
-2. **Component generators**, which extend existing projects
-3. **Feature packs**, which add optional tooling and integrations
-
-This model ensures that the addition of new generators or features does not require major changes to the core tool.
-
-Generated projects should include minimal metadata that allows Scaff to identify the project type and available generators. This enables future commands to safely extend the project.
+This capability simplifies distributing CLI tools.
 
 ---
 
 # Extensibility
 
-A key design goal for Scaff is the ability to add new generators over time without rewriting the core engine.
+A core design goal of Scaff is extensibility.
 
-The tool should therefore support:
+The generator engine should allow new capabilities to be added with minimal impact on existing functionality.
 
-* additional project types
-* additional component generators
-* reusable feature packs
-* template-driven file generation
+Potential extensions include:
 
-Examples of potential future generators include:
+* web application generators
+* worker/job generators
+* monorepo layouts containing multiple binaries
+* additional development tooling integrations
+* additional architecture styles
 
-* web application routes and handlers
-* worker jobs and queues
-* repository-level tooling
-* monorepo workspaces containing multiple binaries
+Because project types, generators, and architecture styles are independent concepts, new capabilities can be introduced incrementally.
 
-Because these features rely on the same underlying generator model, they can be introduced incrementally.
+---
+
+# Developer Experience
+
+Scaff should provide a simple and discoverable command-line interface that organizes operations around generators.
+
+Developers should be able to:
+
+* create new projects
+* inspect available generators
+* add components within existing projects
+* enable optional tooling integrations
+
+The CLI should remain intuitive and predictable so developers can easily understand what will be generated.
 
 ---
 
@@ -229,24 +268,26 @@ Because these features rely on the same underlying generator model, they can be 
 
 The first version of Scaff will be successful if developers can:
 
-* create a Go package with minimal setup
-* create a CLI application with a clear starting structure
-* optionally enable development tooling such as CI and Makefiles
-* generate additional components inside CLI projects
-* understand and modify generated code easily
+* quickly generate a Go package with a working module and test scaffold
+* create a CLI application with a clean entrypoint
+* optionally enable Makefile, CI, and release integrations
+* add new commands to a CLI project using a generator
+* understand and modify generated code without difficulty
 
-The tool should reduce friction when starting new projects while keeping the generated code straightforward and transparent.
+The generated code should remain simple, idiomatic, and easy to maintain.
 
 ---
 
-# Future Opportunities
+# Long-Term Opportunity
 
-If Scaff proves useful, future development may include:
+If Scaff proves useful, it could evolve into a standard scaffolding tool for Go development workflows.
 
-* generators for web services and APIs
-* background worker templates
-* multi-component repository layouts
-* richer component generators for existing project types
-* template sharing and distribution mechanisms
+Future expansions may include:
 
-The long-term value of Scaff lies in providing a flexible generator framework that grows alongside the Go ecosystem while maintaining a simple and pragmatic developer experience.
+* richer generators for service-oriented applications
+* generators for worker systems
+* project structures for multi-service repositories
+* reusable template packs for teams
+* structured project upgrades and migrations
+
+The long-term value of Scaff lies in providing a flexible generator system that grows with the needs of Go developers while maintaining a simple and pragmatic user experience.
