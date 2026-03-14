@@ -19,7 +19,7 @@ func TestGenerate_AllFeaturesEnabled(t *testing.T) {
 	result, err := gen.Generate(generator.Request{
 		Name:       "mylib",
 		ModulePath: "github.com/user/mylib",
-		Style:      "default",
+		Style:      "minimal",
 		Features:   []string{"agents", "makefile", "ci"},
 		OutputDir:  projectDir,
 	})
@@ -63,7 +63,7 @@ func TestGenerate_NoFeatures(t *testing.T) {
 	result, err := gen.Generate(generator.Request{
 		Name:       "bare",
 		ModulePath: "bare",
-		Style:      "default",
+		Style:      "minimal",
 		Features:   []string{},
 		OutputDir:  projectDir,
 	})
@@ -115,7 +115,7 @@ func TestGenerate_MetadataContents(t *testing.T) {
 	_, err := gen.Generate(generator.Request{
 		Name:       "metacheck",
 		ModulePath: "metacheck",
-		Style:      "default",
+		Style:      "minimal",
 		Features:   []string{"makefile"},
 		OutputDir:  projectDir,
 	})
@@ -136,8 +136,8 @@ func TestGenerate_MetadataContents(t *testing.T) {
 	if meta.ProjectType != "package" {
 		t.Errorf("expected project_type %q, got %q", "package", meta.ProjectType)
 	}
-	if meta.Style != "default" {
-		t.Errorf("expected style %q, got %q", "default", meta.Style)
+	if meta.Style != "minimal" {
+		t.Errorf("expected style %q, got %q", "minimal", meta.Style)
 	}
 	if !slices.Contains(meta.Features, "makefile") {
 		t.Errorf("expected features to contain %q, got %v", "makefile", meta.Features)
@@ -154,7 +154,7 @@ func TestGenerate_LicenseSelected_WritesLICENSE(t *testing.T) {
 	result, err := gen.Generate(generator.Request{
 		Name:       "licensed",
 		ModulePath: "github.com/user/licensed",
-		Style:      "default",
+		Style:      "minimal",
 		Features:   []string{},
 		OutputDir:  projectDir,
 		License:    "MIT",
@@ -185,7 +185,7 @@ func TestGenerate_HyphenatedName(t *testing.T) {
 	result, err := gen.Generate(generator.Request{
 		Name:       "my-lib",
 		ModulePath: "github.com/user/my-lib",
-		Style:      "default",
+		Style:      "minimal",
 		Features:   []string{},
 		OutputDir:  projectDir,
 	})
@@ -213,10 +213,10 @@ func TestGenerate_ValidationErrors(t *testing.T) {
 		name string
 		req  generator.Request
 	}{
-		{"empty name", generator.Request{Name: "", ModulePath: "mod", Style: "default"}},
-		{"empty module", generator.Request{Name: "x", ModulePath: "", Style: "default"}},
+		{"empty name", generator.Request{Name: "", ModulePath: "mod", Style: "minimal"}},
+		{"empty module", generator.Request{Name: "x", ModulePath: "", Style: "minimal"}},
 		{"bad style", generator.Request{Name: "x", ModulePath: "x", Style: "unknown"}},
-		{"bad feature", generator.Request{Name: "x", ModulePath: "x", Style: "default", Features: []string{"nope"}}},
+		{"bad feature", generator.Request{Name: "x", ModulePath: "x", Style: "minimal", Features: []string{"nope"}}},
 	}
 
 	for _, tc := range tests {
@@ -243,7 +243,7 @@ func TestGenerate_RefusesNonEmptyDir(t *testing.T) {
 	_, err := gen.Generate(generator.Request{
 		Name:       "existing",
 		ModulePath: "existing",
-		Style:      "default",
+		Style:      "minimal",
 		OutputDir:  projectDir,
 	})
 	if err == nil {

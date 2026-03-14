@@ -37,7 +37,7 @@ func New() *Generator {
 
 func NewWithDeps(d Deps) *Generator {
 	if d.Style.Name == "" {
-		d.Style = structure.DefaultPackageStyle()
+		d.Style = structure.MinimalPackageStyle()
 	}
 	if d.NewWriter == nil {
 		d.NewWriter = filesystem.NewWriter
@@ -183,8 +183,8 @@ func validate(req generator.Request) error {
 	if req.ModulePath == "" {
 		return fmt.Errorf("module path is required")
 	}
-	if req.Style != "default" {
-		return fmt.Errorf("unsupported architecture style: %q (only \"default\" is available)", req.Style)
+	if req.Style != "minimal" {
+		return fmt.Errorf("unsupported architecture style: %q (only \"minimal\" is available)", req.Style)
 	}
 	validFeatures := []string{"agents", "makefile", "ci"}
 	for _, f := range req.Features {

@@ -35,7 +35,7 @@ func NewPackageCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&opts.modulePath, "module", "", "Go module path (defaults to project name)")
-	cmd.Flags().StringVar(&opts.style, "style", "default", "Architecture style for the project")
+	cmd.Flags().StringVar(&opts.style, "style", "minimal", "Architecture style for the project")
 	cmd.Flags().BoolVar(&opts.agents, "agents", true, "Generate an AGENTS.md file")
 	cmd.Flags().BoolVar(&opts.makefile, "makefile", true, "Generate a Makefile")
 	cmd.Flags().BoolVar(&opts.ci, "ci", true, "Generate CI configuration (GitHub Actions)")

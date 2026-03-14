@@ -6,8 +6,8 @@ import (
 	"scaff/internal/structure"
 )
 
-func TestDefaultPackageStyle_Resolve(t *testing.T) {
-	style := structure.DefaultPackageStyle()
+func TestMinimalPackageStyle_Resolve(t *testing.T) {
+	style := structure.MinimalPackageStyle()
 
 	tests := []struct {
 		component string

@@ -5,9 +5,9 @@ type Style struct {
 	Paths map[string]string
 }
 
-func DefaultPackageStyle() Style {
+func MinimalPackageStyle() Style {
 	return Style{
-		Name: "default",
+		Name: "minimal",
 		Paths: map[string]string{
 			"root":   ".",
 			"source": ".",
